@@ -1,255 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Luxury Digital Flipbook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luxury Restaurant Menu</title>
 
   <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
       font-family: "Segoe UI", sans-serif;
     }
 
-    body{
-      background: linear-gradient(135deg,#0f172a,#1e293b);
-      height:100vh;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      overflow:hidden;
-      padding:20px;
+    body {
+      background: #000;
+      height: 100vh;
+      overflow: hidden;
     }
 
-    .container{
-      width:100%;
-      max-width:1000px;
-      height:92vh;
-      background: rgba(255,255,255,0.06);
+    .menu-container {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* ===== IMAGE FULL SCREEN ===== */
+
+    .menu-image {
+      width: 100%;
+      height: 88vh;
+      object-fit: contain;
+      transition: opacity 0.3s ease;
+    }
+
+    /* ===== TOP INFO ===== */
+
+    .top-bar {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.45);
       backdrop-filter: blur(10px);
-      border-radius:20px;
-      overflow:hidden;
-      box-shadow:0 10px 40px rgba(0,0,0,0.5);
-      position:relative;
-      display:flex;
-      flex-direction:column;
+      color: white;
+      padding: 10px 22px;
+      border-radius: 50px;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+      z-index: 10;
+      border: 1px solid rgba(255,255,255,0.08);
     }
 
-    .header{
-      padding:18px 25px;
-      color:white;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      background:rgba(255,255,255,0.05);
-      border-bottom:1px solid rgba(255,255,255,0.08);
+    /* ===== BOTTOM CONTROLS ===== */
+
+    .controls {
+      position: absolute;
+      bottom: 25px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      z-index: 10;
     }
 
-    .header h2{
-      font-size:22px;
-      font-weight:600;
+    .btn {
+      padding: 12px 26px;
+      border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.25s ease;
     }
 
-    .page-count{
-      opacity:0.8;
-      font-size:15px;
+    .btn:hover {
+      background: rgba(255,255,255,0.18);
+      transform: translateY(-2px);
     }
 
-    .viewer{
-      flex:1;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      padding:20px;
-      position:relative;
-    }
+    /* ===== MOBILE ===== */
 
-    .viewer img{
-      max-width:100%;
-      max-height:100%;
-      object-fit:contain;
-      border-radius:14px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.4);
-      transition:0.3s ease;
-      background:white;
-    }
+    @media (max-width: 768px) {
 
-    .controls{
-      position:absolute;
-      width:100%;
-      display:flex;
-      justify-content:space-between;
-      padding:0 18px;
-      top:50%;
-      transform:translateY(-50%);
-    }
-
-    .btn{
-      width:55px;
-      height:55px;
-      border:none;
-      border-radius:50%;
-      background:rgba(255,255,255,0.18);
-      color:white;
-      font-size:24px;
-      cursor:pointer;
-      backdrop-filter:blur(5px);
-      transition:0.25s ease;
-    }
-
-    .btn:hover{
-      background:rgba(255,255,255,0.35);
-      transform:scale(1.08);
-    }
-
-    .footer{
-      text-align:center;
-      padding:14px;
-      color:rgba(255,255,255,0.75);
-      font-size:14px;
-      background:rgba(255,255,255,0.04);
-    }
-
-    @media(max-width:768px){
-
-      .container{
-        height:96vh;
+      .menu-image {
+        height: 92vh;
       }
 
-      .header h2{
-        font-size:18px;
+      .btn {
+        padding: 10px 18px;
+        font-size: 14px;
       }
 
-      .btn{
-        width:48px;
-        height:48px;
-        font-size:20px;
+      .top-bar {
+        font-size: 13px;
+        padding: 8px 18px;
       }
 
     }
-
   </style>
 </head>
 
 <body>
 
-  <div class="container">
+  <div class="menu-container">
 
-    <div class="header">
-      <h2>Temple Cafe Menu</h2>
-      <div class="page-count" id="pageCount">
-        Page 1 of 15
-      </div>
+    <!-- PAGE COUNT -->
+    <div class="top-bar" id="pageCount">
+      Menu Page 1 / 15
     </div>
 
-    <div class="viewer">
+    <!-- MENU IMAGE -->
+    <img id="menuImage" class="menu-image" src="page1.jpg" alt="Restaurant Menu">
 
-      <img id="bookImage" src="page1.jpg" alt="Menu Page">
+    <!-- CONTROLS -->
+    <div class="controls">
 
-      <div class="controls">
-        <button class="btn" onclick="prevPage()">❮</button>
-        <button class="btn" onclick="nextPage()">❯</button>
-      </div>
+      <button class="btn" onclick="prevPage()">
+        ← Previous
+      </button>
 
-    </div>
+      <button class="btn" onclick="nextPage()">
+        Next →
+      </button>
 
-    <div class="footer">
-      Use Arrow Keys or Swipe on Mobile
     </div>
 
   </div>
 
-<script>
+  <script>
 
-  // ===== TOTAL IMAGES =====
-  const totalPages = 15;
+    // ===== TOTAL MENU PAGES =====
+    const totalPages = 15;
 
-  let currentPage = 1;
+    let currentPage = 1;
 
-  const image = document.getElementById("bookImage");
-  const pageCount = document.getElementById("pageCount");
+    const image = document.getElementById("menuImage");
+    const pageCount = document.getElementById("pageCount");
 
-  function updateImage(){
+    function updatePage() {
 
-    image.style.opacity = 0;
+      image.style.opacity = 0;
 
-    setTimeout(() => {
+      setTimeout(() => {
 
-      image.src = `page${currentPage}.jpg`;
+        image.src = `page${currentPage}.jpg`;
 
-      pageCount.innerText = `Page ${currentPage} of ${totalPages}`;
+        pageCount.innerText = `Menu Page ${currentPage} / ${totalPages}`;
 
-      image.style.opacity = 1;
+        image.style.opacity = 1;
 
-    },150);
-
-  }
-
-  function nextPage(){
-
-    // Stop at page15.jpg
-    if(currentPage < totalPages){
-
-      currentPage++;
-      updateImage();
+      }, 150);
 
     }
 
-  }
+    // ===== NEXT PAGE =====
 
-  function prevPage(){
+    function nextPage() {
 
-    // Stop at page1.jpg
-    if(currentPage > 1){
+      if (currentPage < totalPages) {
 
-      currentPage--;
-      updateImage();
+        currentPage++;
+        updatePage();
+
+      }
 
     }
 
-  }
+    // ===== PREVIOUS PAGE =====
 
-  // Keyboard Navigation
+    function prevPage() {
 
-  document.addEventListener("keydown",(e)=>{
+      if (currentPage > 1) {
 
-    if(e.key === "ArrowRight"){
-      nextPage();
+        currentPage--;
+        updatePage();
+
+      }
+
     }
 
-    if(e.key === "ArrowLeft"){
-      prevPage();
-    }
+    // ===== KEYBOARD SUPPORT =====
 
-  });
+    document.addEventListener("keydown", (e) => {
 
-  // Mobile Swipe Support
+      if (e.key === "ArrowRight") {
+        nextPage();
+      }
 
-  let startX = 0;
+      if (e.key === "ArrowLeft") {
+        prevPage();
+      }
 
-  document.addEventListener("touchstart",(e)=>{
+    });
 
-    startX = e.touches[0].clientX;
+    // ===== MOBILE SWIPE SUPPORT =====
 
-  });
+    let startX = 0;
 
-  document.addEventListener("touchend",(e)=>{
+    document.addEventListener("touchstart", (e) => {
 
-    let endX = e.changedTouches[0].clientX;
+      startX = e.touches[0].clientX;
 
-    if(startX - endX > 50){
-      nextPage();
-    }
+    });
 
-    if(endX - startX > 50){
-      prevPage();
-    }
+    document.addEventListener("touchend", (e) => {
 
-  });
+      let endX = e.changedTouches[0].clientX;
 
-</script>
+      if (startX - endX > 50) {
+        nextPage();
+      }
+
+      if (endX - startX > 50) {
+        prevPage();
+      }
+
+    });
+
+  </script>
 
 </body>
+
 </html>

@@ -3,45 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobile-First PDF Viewer</title>
+    <title>Temple Cafe Menu Viewer</title>
     <style>
-        /* CSS Variables for consistent spacing */
         :root {
             --spacing: 16px;
             --primary-color: #007bff;
             --bg-color: #f8f9fa;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, sans-serif;
             background-color: var(--bg-color);
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: var(--spacing); /* Uniform outer padding */
-        }
-
-        h2 {
-            margin-bottom: var(--spacing);
-            font-size: 1.5rem;
-            text-align: center;
+            padding: var(--spacing);
         }
 
         .controls {
             display: flex;
             align-items: center;
-            justify-content:调节;
+            justify-content: space-between; /* Fixed typo here */
             width: 100%;
             max-width: 500px;
-            margin-bottom: var(--spacing); /* Same margin as padding */
-            gap: var(--spacing); /* Consistent spacing between buttons */
+            margin-bottom: var(--spacing);
+            gap: var(--spacing);
         }
 
         button {
@@ -54,48 +43,28 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: opacity 0.2s;
         }
 
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        #page-info {
-            white-space: nowrap;
-            font-size: 0.9rem;
-            color: #333;
-        }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
 
         .pdf-container {
             width: 100%;
             max-width: 800px;
-            flex-grow: 1; /* Fills remaining space */
+            flex-grow: 1;
             border: 1px solid #ddd;
             border-radius: 8px;
             overflow: hidden;
             background: #fff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        iframe {
-            width: 100%;
-            height: 100%;
-            min-height: 500px; /* Ensures visibility on mobile */
-            border: none;
-        }
+        iframe { width: 100%; height: 100%; min-height: 500px; border: none; }
 
-        /* Desktop Adjustments */
-        @media (min-width: 768px) {
-            h2 { font-size: 2rem; }
-            iframe { min-height: 70vh; }
-        }
+        @media (min-width: 768px) { iframe { min-height: 75vh; } }
     </style>
 </head>
 <body>
 
-    <h2>Document Viewer</h2>
+    <h2>Temple Cafe Menu</h2>
 
     <div class="controls">
         <button id="prevBtn" onclick="changePage(-1)">Prev</button>
@@ -104,7 +73,6 @@
     </div>
 
     <div class="pdf-container">
-        <!-- 'document.pdf' must be in the same GitHub folder -->
         <iframe id="pdfViewer" src="Temple_Cafe_Complete_Menu.pdf#page=1"></iframe>
     </div>
 
@@ -115,6 +83,7 @@
         const currentDisplay = document.getElementById('current');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
+        const fileName = "Temple_Cafe_Complete_Menu.pdf";
 
         function updateUI() {
             currentDisplay.innerText = currentPage;
@@ -126,13 +95,10 @@
             let targetPage = currentPage + step;
             if (targetPage >= 1 && targetPage <= totalPages) {
                 currentPage = targetPage;
-                // Standard URL fragment to trigger page jump
-                viewer.src = `document.pdf#page=${currentPage}`;
+                viewer.src = `${fileName}#page=${currentPage}`;
                 updateUI();
             }
         }
-
-        // Run on load
         updateUI();
     </script>
 </body>

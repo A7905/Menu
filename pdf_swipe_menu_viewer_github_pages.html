@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luxury Digital Menu</title>
+
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0f0f0f;
+      color: white;
+      font-family: Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .page-counter {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .slider-container {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 70px);
+      overflow: hidden;
+    }
+
+    .viewer-wrapper {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      touch-action: pan-y;
+    }
+
+    .viewer {
+      transition: transform 0.4s ease-in-out;
+      margin-top: 70px;
+      display: flex;
+      overflow-x: hidden;
+      display: flex;
+      will-change: transform;
+      height: calc(100vh - 70px);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .viewer::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1000;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      font-size: 24px;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+    }
+
+    .left {
+      left: 10px;
+    }
+
+    .right {
+      right: 10px;
+    }
+
+    .page {
+      min-width: 100vw;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      scroll-snap-align: center;
+      padding: 10px;
+    }
+
+    canvas {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 14px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      background: white;
+    }
+
+    .loader {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .hint {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.6);
+      padding: 10px 16px;
+      border-radius: 30px;
+      font-size: 13px;
+      opacity: 0.9;
+      z-index: 999;
+    }
+
+    @media (min-width: 768px) {
+      canvas {
+        max-width: 70%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+    <div>Loading Menu...</div>
+  </div>
+
+  <div class="topbar">
+    <div class="title">Temple Café Menu</div>
+    <div class="page-counter" id="pageCounter">Page 1</div>
+  </div>
+
+  <div class="slider-container">
+    <button class="nav-btn left" id="prevBtn">❮</button>
+
+    <div class="viewer-wrapper">
+      <div class="viewer" id="viewer"></div>
+    </div>
+
+    <button class="nav-btn right" id="nextBtn">❯</button>
+  </div>
+
+  <div class="hint">
+    Swipe left/right to change pages
+  </div>
+
+  <script>
+    // ==============================
+    // PASTE YOUR PDF LINK BELOW
+    // ==============================
+
+    const pdfUrl = "https://drive.google.com/uc?export=download&id=1P36pM63JigI6AJIS8M29hQubwLEfGsmB";
+
+    // Example:
+    // const pdfUrl = "https://drive.google.com/uc?export=download&id=YOUR_FILE_ID";
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const viewer = document.getElementById('viewer');
+    const loader = document.getElementById('loader');
+    const pageCounter = document.getElementById('pageCounter');
+
+    async function renderPDF() {
+      try {
+        const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+
+          const viewport = page.getViewport({ scale: 2 });
+
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          await page.render({
+            canvasContext: context,
+            viewport: viewport
+          }).promise;
+
+          const pageDiv = document.createElement('div');
+          pageDiv.className = 'page';
+          pageDiv.appendChild(canvas);
+
+          viewer.appendChild(pageDiv);
+        }
+
+        loader.style.display = 'none';
+
+      } catch (error) {
+        loader.innerHTML = `
+          <div style="text-align:center;padding:20px;">
+            <h2>Unable to load PDF</h2>
+            <br>
+            <p>Please check your public PDF link.</p>
+          </div>
+        `;
+
+        console.error(error);
+      }
+    }
+
+    renderPDF();
+
+    // True Slide Effect
+    let currentPage = 0;
+    let totalPages = 0;
+
+    function updateSlider() {
+      viewer.style.transform = `translateX(-${currentPage * window.innerWidth}px)`;
+      pageCounter.innerText = `Page ${currentPage + 1}`;
+    }
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      if (currentPage < totalPages - 1) {
+        currentPage++;
+        updateSlider();
+      }
+    });
+
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      if (currentPage > 0) {
+        currentPage--;
+        updateSlider();
+      }
+    });
+
+    // Touch Swipe Support
+    let startX = 0;
+
+    viewer.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+    });
+
+    viewer.addEventListener('touchend', (e) => {
+      const endX = e.changedTouches[0].clientX;
+      const diff = startX - endX;
+
+      if (diff > 50 && currentPage < totalPages - 1) {
+        currentPage++;
+        updateSlider();
+      }
+
+      if (diff < -50 && currentPage > 0) {
+        currentPage--;
+        updateSlider();
+      }
+    });
+
+    // Detect Total Pages
+    const observer = new MutationObserver(() => {
+      totalPages = document.querySelectorAll('.page').length;
+    });
+
+    observer.observe(viewer, {
+      childList: true
+    });
+  </script>
+
+</body>
+</html>

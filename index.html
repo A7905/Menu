@@ -1,146 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Temple Cafe Menu - Image Viewer</title>
-    <style>
-        :root {
-            --spacing: 16px;
-            --primary-color: #007bff;
-            --bg-color: #f8f9fa;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Luxury Digital Flipbook</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
 
-        body {
-            font-family: -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: var(--spacing);
-        }
+    body{
+      background: linear-gradient(135deg,#0f172a,#1e293b);
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      overflow:hidden;
+      padding:20px;
+    }
 
-        h2 {
-            margin-bottom: var(--spacing);
-            font-size: 1.5rem;
-            color: #333;
-        }
+    .container{
+      width:100%;
+      max-width:1000px;
+      height:92vh;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(10px);
+      border-radius:20px;
+      overflow:hidden;
+      box-shadow:0 10px 40px rgba(0,0,0,0.5);
+      position:relative;
+      display:flex;
+      flex-direction:column;
+    }
 
-        .controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 500px;
-            margin-bottom: var(--spacing);
-            gap: var(--spacing);
-        }
+    .header{
+      padding:18px 25px;
+      color:white;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background:rgba(255,255,255,0.05);
+      border-bottom:1px solid rgba(255,255,255,0.08);
+    }
 
-        button {
-            flex: 1;
-            padding: 14px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: white;
-            background-color: var(--primary-color);
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+    .header h2{
+      font-size:22px;
+      font-weight:600;
+    }
 
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
+    .page-count{
+      opacity:0.8;
+      font-size:15px;
+    }
 
-        #page-info {
-            font-weight: bold;
-            color: #555;
-            min-width: 80px;
-            text-align: center;
-        }
+    .viewer{
+      flex:1;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+      position:relative;
+    }
 
-        .image-container {
-            width: 100%;
-            max-width: 600px; /* Standard mobile-friendly width */
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
+    .viewer img{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+      border-radius:14px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.4);
+      transition:0.3s ease;
+      background:white;
+    }
 
-        #menuImage {
-            width: 100%;
-            height: auto;
-            display: block;
-            transition: opacity 0.3s ease-in-out;
-        }
+    .controls{
+      position:absolute;
+      width:100%;
+      display:flex;
+      justify-content:space-between;
+      padding:0 18px;
+      top:50%;
+      transform:translateY(-50%);
+    }
 
-        /* Subtle fade effect when changing images */
-        .fade { opacity: 0.3; }
-    </style>
+    .btn{
+      width:55px;
+      height:55px;
+      border:none;
+      border-radius:50%;
+      background:rgba(255,255,255,0.18);
+      color:white;
+      font-size:24px;
+      cursor:pointer;
+      backdrop-filter:blur(5px);
+      transition:0.25s ease;
+    }
+
+    .btn:hover{
+      background:rgba(255,255,255,0.35);
+      transform:scale(1.08);
+    }
+
+    .footer{
+      text-align:center;
+      padding:14px;
+      color:rgba(255,255,255,0.75);
+      font-size:14px;
+      background:rgba(255,255,255,0.04);
+    }
+
+    @media(max-width:768px){
+
+      .container{
+        height:96vh;
+      }
+
+      .header h2{
+        font-size:18px;
+      }
+
+      .btn{
+        width:48px;
+        height:48px;
+        font-size:20px;
+      }
+
+    }
+
+  </style>
 </head>
+
 <body>
 
-    <h2>Temple Cafe Menu</h2>
+  <div class="container">
 
-    <div class="controls">
-        <button id="prevBtn" onclick="changePage(-1)">Prev</button>
-        <span id="page-info">Page <span id="current">1</span> / 15</span>
-        <button id="nextBtn" onclick="changePage(1)">Next</button>
+    <div class="header">
+      <h2>Temple Cafe Menu</h2>
+      <div class="page-count" id="pageCount">
+        Page 1 of 15
+      </div>
     </div>
 
-    <div class="image-container">
-        <img id="menuImage" src="images/page1.jpg" alt="Menu Page 1">
+    <div class="viewer">
+
+      <img id="bookImage" src="page1.jpg" alt="Menu Page">
+
+      <div class="controls">
+        <button class="btn" onclick="prevPage()">❮</button>
+        <button class="btn" onclick="nextPage()">❯</button>
+      </div>
+
     </div>
 
-    <script>
-        let currentPage = 1;
-        const totalPages = 15;
-        const menuImage = document.getElementById('menuImage');
-        const currentDisplay = document.getElementById('current');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
+    <div class="footer">
+      Use Arrow Keys or Swipe on Mobile
+    </div>
 
-        function updateUI() {
-            currentDisplay.innerText = currentPage;
-            prevBtn.disabled = (currentPage === 1);
-            nextBtn.disabled = (currentPage === totalPages);
-            
-            // Update the image source
-            // Ensure your images are named page1.jpg, page2.jpg... in an 'images' folder
-            menuImage.classList.add('fade');
-            
-            setTimeout(() => {
-                menuImage.src = `images/page${currentPage}.jpg`;
-                menuImage.alt = `Menu Page ${currentPage}`;
-                menuImage.classList.remove('fade');
-            }, 150);
-        }
+  </div>
 
-        function changePage(step) {
-            let targetPage = currentPage + step;
-            if (targetPage >= 1 && targetPage <= totalPages) {
-                currentPage = targetPage;
-                updateUI();
-                // Scroll to top when page changes (good for mobile)
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
+<script>
 
-        updateUI();
-    </script>
+  // ===== TOTAL IMAGES =====
+  const totalPages = 15;
+
+  let currentPage = 1;
+
+  const image = document.getElementById("bookImage");
+  const pageCount = document.getElementById("pageCount");
+
+  function updateImage(){
+
+    image.style.opacity = 0;
+
+    setTimeout(() => {
+
+      image.src = `page${currentPage}.jpg`;
+
+      pageCount.innerText = `Page ${currentPage} of ${totalPages}`;
+
+      image.style.opacity = 1;
+
+    },150);
+
+  }
+
+  function nextPage(){
+
+    // Stop at page15.jpg
+    if(currentPage < totalPages){
+
+      currentPage++;
+      updateImage();
+
+    }
+
+  }
+
+  function prevPage(){
+
+    // Stop at page1.jpg
+    if(currentPage > 1){
+
+      currentPage--;
+      updateImage();
+
+    }
+
+  }
+
+  // Keyboard Navigation
+
+  document.addEventListener("keydown",(e)=>{
+
+    if(e.key === "ArrowRight"){
+      nextPage();
+    }
+
+    if(e.key === "ArrowLeft"){
+      prevPage();
+    }
+
+  });
+
+  // Mobile Swipe Support
+
+  let startX = 0;
+
+  document.addEventListener("touchstart",(e)=>{
+
+    startX = e.touches[0].clientX;
+
+  });
+
+  document.addEventListener("touchend",(e)=>{
+
+    let endX = e.changedTouches[0].clientX;
+
+    if(startX - endX > 50){
+      nextPage();
+    }
+
+    if(endX - startX > 50){
+      prevPage();
+    }
+
+  });
+
+</script>
+
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Temple Cafe Menu Viewer</title>
+    <title>Temple Cafe Menu - Image Viewer</title>
     <style>
         :root {
             --spacing: 16px;
@@ -11,7 +11,11 @@
             --bg-color: #f8f9fa;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: -apple-system, sans-serif;
@@ -23,10 +27,16 @@
             padding: var(--spacing);
         }
 
+        h2 {
+            margin-bottom: var(--spacing);
+            font-size: 1.5rem;
+            color: #333;
+        }
+
         .controls {
             display: flex;
             align-items: center;
-            justify-content: space-between; /* Fixed typo here */
+            justify-content: space-between;
             width: 100%;
             max-width: 500px;
             margin-bottom: var(--spacing);
@@ -35,7 +45,7 @@
 
         button {
             flex: 1;
-            padding: 12px;
+            padding: 14px;
             font-size: 1rem;
             font-weight: 600;
             color: white;
@@ -43,23 +53,43 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
 
-        .pdf-container {
+        #page-info {
+            font-weight: bold;
+            color: #555;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .image-container {
             width: 100%;
-            max-width: 800px;
-            flex-grow: 1;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            max-width: 600px; /* Standard mobile-friendly width */
+            background: white;
+            border-radius: 12px;
             overflow: hidden;
-            background: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
 
-        iframe { width: 100%; height: 100%; min-height: 500px; border: none; }
+        #menuImage {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: opacity 0.3s ease-in-out;
+        }
 
-        @media (min-width: 768px) { iframe { min-height: 75vh; } }
+        /* Subtle fade effect when changing images */
+        .fade { opacity: 0.3; }
     </style>
 </head>
 <body>
@@ -72,33 +102,44 @@
         <button id="nextBtn" onclick="changePage(1)">Next</button>
     </div>
 
-    <div class="pdf-container">
-        <iframe id="pdfViewer" src="Temple_Cafe_Complete_Menu.pdf#page=1"></iframe>
+    <div class="image-container">
+        <img id="menuImage" src="images/page1.jpg" alt="Menu Page 1">
     </div>
 
     <script>
         let currentPage = 1;
         const totalPages = 15;
-        const viewer = document.getElementById('pdfViewer');
+        const menuImage = document.getElementById('menuImage');
         const currentDisplay = document.getElementById('current');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
-        const fileName = "Temple_Cafe_Complete_Menu.pdf";
 
         function updateUI() {
             currentDisplay.innerText = currentPage;
             prevBtn.disabled = (currentPage === 1);
             nextBtn.disabled = (currentPage === totalPages);
+            
+            // Update the image source
+            // Ensure your images are named page1.jpg, page2.jpg... in an 'images' folder
+            menuImage.classList.add('fade');
+            
+            setTimeout(() => {
+                menuImage.src = `images/page${currentPage}.jpg`;
+                menuImage.alt = `Menu Page ${currentPage}`;
+                menuImage.classList.remove('fade');
+            }, 150);
         }
 
         function changePage(step) {
             let targetPage = currentPage + step;
             if (targetPage >= 1 && targetPage <= totalPages) {
                 currentPage = targetPage;
-                viewer.src = `${fileName}#page=${currentPage}`;
                 updateUI();
+                // Scroll to top when page changes (good for mobile)
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
+
         updateUI();
     </script>
 </body>
